@@ -79,6 +79,7 @@ function nouveau() {
         document.getElementById("add").disabled=false;
         document.getElementById("TW").innerText="0.00";
         setInterval(function () {
+            document.getElementById("PF").innerText = Number(document.getElementById("compt").innerText)/(30*currentSession.getTWInteractif())
             document.getElementById("TW").innerText = currentSession.getTWInteractif();
         }, 1000*30)
     }
