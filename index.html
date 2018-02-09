@@ -6,38 +6,104 @@
     <link rel="stylesheet" href="style/material-components-web.min.css">
     <link rel="stylesheet" href="style/styles.css">
 </head>
-<body>
-<div>
-    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="new" onclick="nouveau()">
-        <span class="mdc-fab__icon">
-            play_arrow
-        </span>
-    </button>
-    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="finish" onclick="finish()" disabled="true">
-        <span class="mdc-fab__icon">
-            stop
-        </span>
-    </button>
-</div>
-<div id="compteur">
-    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="add" onclick="add()">
-        <span class="mdc-fab__icon">
-            add
-        </span>
-    </button>
-    <button disabled id="compt">0</button>
-    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="remove" onclick="remove()" disabled="true">
-        <span class="mdc-fab__icon">
-            remove
-        </span>
-    </button>
-</div>
-<div id="stat">
-    <div>Heure début : <span id="DD"></span></div>
-    <div>Temps travaillé : <span id="TW"></span></div>
-</div>
+<body class="mdc-typography">
 
-<script src="script.js"></script>
+<div class="mdc-toolbar mdc-toolbar--fixed mdc-theme-primary">
+    <div class="mdc-toolbar__row">
+        <div class="mdc-toolbar__section mdc-toolbar__section--align-start">
+            <span class="mdc-toolbar__title">LionbridgePointeur</span>
+        </div>
+    </div>
+    <div class="mdc-toolbar__row">
+        <div class="mdc-toolbar__section mdc-toolbar__section--align-end">
+            <nav id="dynamic-tab-bar" class="mdc-tab-bar mdc-tab-bar--indicator-accent" role="tablist">
+                <a role="tab" aria-controls="accueil"
+                   class="mdc-tab mdc-tab--active" href="#accueil">Accueil</a>
+                <a role="tab" aria-controls="projets"
+                   class="mdc-tab" href="#historique">Historique</a>
+                <span class="mdc-tab-bar__indicator"></span>
+            </nav>
+        </div>
+    </div>
+</div>
+<main class="mdc-toolbar-fixed-adjust">
+    <div class="panels">
+        <div class="panel active" id="accueil" role="tabpanel" aria-hidden="false">
+            <div class="organizer">
+                <div class="mdc-card carte">
+                    <section class="mdc-card__primary">
+                        <h1 class="mdc-card__title mdc-card__title--large">Travailler</h1>
+                    </section>
+                    <div class="mdc-card__actions">
+                        <div class="mdc-card__action-icons">
+                            <button class="mdc-card__action mdc-card__action--icon mdc-fab material-icons mdc-ripple-upgraded"
+                                    id="new" onclick="nouveau()">
+                 <span class="mdc-fab__icon">
+                    play_arrow
+                 </span>
+                            </button>
+                            <button class="mdc-card__action mdc-card__action--icon mdc-fab material-icons mdc-ripple-upgraded"
+                                    id="finish" onclick="finish()" disabled="true">
+                <span class="mdc-fab__icon">
+                    stop
+                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mdc-card carte">
+                    <section class="mdc-card__primary">
+                        <h1 class="mdc-card__title mdc-card__title--large">Compteur de tâches</h1>
+                    </section>
+                    <div class="mdc-card__actions">
+                        <div class="mdc-card__action-icons">
+                            <button disabled="true" class="mdc-card__action mdc-card__action--icon mdc-fab material-icons mdc-ripple-upgraded"
+                                    id="add" onclick="add()">
+                                <span class="mdc-fab__icon">
+                                    add
+                                </span>
+                            </button>
+                            <button class="mdc-button mdc-button--raised" disabled="true" id="compt">
+                                0
+                            </button>
+                            <button class="mdc-card__action mdc-card__action--icon mdc-fab material-icons mdc-ripple-upgraded"
+                                    id="remove" onclick="remove()" disabled="true">
+                                <span class="mdc-fab__icon">
+                                    remove
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mdc-card carte">
+                    <section class="mdc-card__primary">
+                        <h1 class="mdc-card__title mdc-card__title--large">Statistiques</h1>
+                    </section>
+                    <div class="mdc-card__supporting-text">
+                        <div>Heure début : <span id="DD"></span></div>
+                        <div>Temps travaillé : <span id="TW"></span></div>
+                        <div>Performance : <span id="PF"></span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel" id="historique" role="tabpanel" aria-hidden="false">
+
+        </div>
+    </div>
+</main>
+
 <script src="style/material-components-web.min.js"></script>
+<script src="js/panel.js"></script>
+<script src="js/script.js"></script>
+<script>
+
+</script>
+<script>
+    var toolbar = mdc.toolbar.MDCToolbar.attachTo(document.querySelector('.mdc-toolbar'));
+    toolbar.fixedAdjustElement = document.querySelector('.mdc-toolbar-fixed-adjust');
+</script>
 </body>
 </html>
