@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="style/material-components-web.min.css">
+    <link rel="stylesheet" href="style/styles.css">
+</head>
+<body>
+<div>
+    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="new" onclick="nouveau()">
+        <span class="mdc-fab__icon">
+            play_arrow
+        </span>
+    </button>
+    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="finish" onclick="finish()" disabled="true">
+        <span class="mdc-fab__icon">
+            stop
+        </span>
+    </button>
+</div>
+<div id="compteur">
+    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="add" onclick="add()">
+        <span class="mdc-fab__icon">
+            add
+        </span>
+    </button>
+    <button disabled id="compt">0</button>
+    <button class="mdc-fab material-icons mdc-ripple-upgraded" id="remove" onclick="remove()" disabled="true">
+        <span class="mdc-fab__icon">
+            remove
+        </span>
+    </button>
+</div>
+<div id="stat">
+    <div>Heure début : <span id="DD"></span></div>
+    <div>Temps travaillé : <span id="TW"></span></div>
+</div>
+
+<script src="script.js"></script>
+<script src="style/material-components-web.min.js"></script>
+</body>
+</html>
