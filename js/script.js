@@ -19,12 +19,37 @@ class Session {
         this.fin = false;
     }
 
-    end(date) {
+    end(date,nbTaches) {
         this.fin = new Horaire(date);
+        this.nbTaches = nbTaches;
+    }
+    /**
+     * Session.isFinished() should be true
+     */
+    generateLi() {
+        var li = "<li class=\"mdc-list-item\">\n" +
+            "                    <i class=\"mdc-list-item__graphic material-icons\" aria-hidden=\"true\">keyboard_arrow_right</i>\n" +
+            "                    <span class=\"mdc-list-item__text\">\n" +
+            "                        "+this.debut.getHeure()+" - "+this.fin.getHeure()+" : "+this.getFinalTW()+" heures\n" +
+            "                        <span class=\"mdc-list-item__secondary-text\">\n" +
+            "                            "+this.nbTaches+" Tâches\n" +
+            "                        </span>\n" +
+            "                    </span>\n" +
+            "                </li>"
+        return li
     }
 
     isFinished(date) {
         return this.fin != false;
+    }
+
+    /**
+     * Session.isFinished() should be true
+     */
+    getFinalTW() {
+        var tempsMs = this.fin.objet - this.debut.objet
+        var tempsS = tempsMs/1000;
+        return precisionRound(tempsS/3600,2);
     }
 
     save() {
@@ -61,14 +86,14 @@ function nouveau() {
 
 function finish() {
     if (currentSession != null) {
-        currentSession.end(new Date());
+        currentSession.end(new Date(),document.getElementById("compt").innerText);
         document.getElementById("new").disabled = false;
         document.getElementById("finish").disabled = true;
         document.getElementById("DD").innerText = "";
         document.getElementById("add").disabled=true;
         document.getElementById("remove").disabled=true;
+        document.getElementById("histoj").innerHTML+=currentSession.generateLi();
         document.getElementById("compt").innerText="0";
-        // Faire un recap
         currentSession.save()
         currentSession=null;
     }
@@ -92,3 +117,5 @@ function remove() {
         document.getElementById("remove").disabled = true;
     }
 }
+
+
