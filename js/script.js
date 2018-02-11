@@ -124,6 +124,6 @@ function remove() {
 }
 
 function majPerf() {
-    document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()))
+    document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()),2)
 }
 
