@@ -28,6 +28,7 @@
 
 .organizer {
     display: flex;
+    flex-wrap: wrap;
 }
 
 #compt {
