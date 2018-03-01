@@ -127,3 +127,6 @@ function majPerf() {
     document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()),2)
 }
 
+window.onbeforeunload = function(){
+    return "T'es sûr de vouloir fermer ?";
+}
