@@ -105,8 +105,13 @@ function finish() {
 
 
 function add() {
-    var compteur = document.getElementById("compt");
+    let compteur = document.getElementById("compt");
     compteur.innerText = Number(compteur.innerText) + 1;
+    let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
+    snackbar.show({
+        message: "+1"
+        }
+    );
     majPerf();
     if (Number(compteur.innerText) > 0)
         document.getElementById("remove").disabled = false;
@@ -116,6 +121,11 @@ function remove() {
     var compteur = document.getElementById("compt");
     if (Number(compteur.innerText) > 0) {
         compteur.innerText = Number(compteur.innerText) - 1;
+        let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
+        snackbar.show({
+                message: "-1"
+            }
+        );
     }
     if (Number(compteur.innerText) <= 0) {
         document.getElementById("remove").disabled = true;
