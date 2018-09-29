@@ -1,76 +1,83 @@
-class Horaire {
-    constructor(date) {
-        this.objet = date.getTime()
-        this.date = date.toLocaleDateString()
-        this.heure = date.getHours()
-        this.minutes = date.getMinutes()
-    }
+modelHoraire = new Horaire(new Date());
+modelSession = new Session(new Date());
 
-    getHeure() {
-        var heures = this.heure < 10 ? "0" + this.heure : this.heure;
-        var minute = this.minutes < 10 ? "0" + this.minutes : this.minutes
-        return heures + ":" + minute
+var today = new Date().toLocaleDateString();
+
+all_sessions = {};
+if (getCookie("all_sessions")) all_sessions = JSON.parse(getCookie("all_sessions"));
+
+/**
+ * ForEach pour les sessions
+ *
+ * @param fonction qui prend comme paramètre chaque element de all_sessions
+ */
+all_sessions.forEach = function(fonction) {
+    all_sessions_keys = Object.keys(all_sessions);
+    i = 0;
+    while (i < all_sessions_keys.length) {
+        current = all_sessions[all_sessions_keys[i]];
+        if(current != all_sessions.forEach) {
+            fonction(current);
+        }
+        i++;
     }
+};
+
+
+
+/*
+all_sessions.forEach(function (element) {
+    element.debut.getHeure = modelHoraire.getHeure();
+    element.fin.getHeure = modelHoraire.getHeure();
+    element.generateLi = modelSession.generateLi();
+    element.getFinalTW = modelSession.getFinalTW();
+});
+*/
+
+today_sessions = [];
+
+all_sessions.forEach(function(current) {
+    if (current.debut.date == today) {
+        today_sessions.push(current);
+    }
+    current.debut.getHeure = modelHoraire.getHeure;
+    current.fin.getHeure = modelHoraire.getHeure;
+    current.generateLi = modelSession.generateLi;
+    current.getFinalTW = modelSession.getFinalTW;
+    document.getElementById("histoj").innerHTML += current.generateLi();
+});
+
+updateAll();
+
+function updateAll() {
+    totalSecondes = 0;
+    totalTaches = 0;
+
+    // Nettoyage sale de historique du jour
+    document.getElementById("histoj").innerHTML = "";
+
+    all_sessions.forEach(function(current) {
+        if(current.debut.date == today) {
+            document.getElementById("histoj").innerHTML += current.generateLi();
+            totalSecondes += current.fin.objet - current.debut.objet;
+            totalTaches += Number(current.nbTaches);
+        }
+    });
+
+    totalHeures = totalSecondes / (60 * 60 * 1000); // 60 minutes * 60 secondes * 1000 millisecondes
+    document.getElementById("today_heures").innerText = precisionRound(totalHeures, 2) + " heures"
+    document.getElementById("today_taches").innerText = totalTaches + " Tâches"
 }
 
-all_sessions = new Array();
-
-class Session {
-    constructor(date) {
-        this.debut = new Horaire(date);
-        this.fin = false;
+function removeSession(timestamp) {
+    delete all_sessions[timestamp];
+    if (navigator.cookieEnabled) {
+        let toSave = JSON.stringify(all_sessions);
+        setCookie("all_sessions", toSave);
+    } else {
+        alert("Activez vos cookies")
     }
-
-    end(date, nbTaches) {
-        this.fin = new Horaire(date);
-        this.nbTaches = nbTaches;
-    }
-
-    /**
-     * Session.isFinished() should be true
-     */
-    generateLi() {
-        var li = "<li class=\"mdc-list-item\">\n" +
-            "                    <i class=\"mdc-list-item__graphic material-icons\" aria-hidden=\"true\">keyboard_arrow_right</i>\n" +
-            "                    <span class=\"mdc-list-item__text\">\n" +
-            "                        " + this.debut.getHeure() + " - " + this.fin.getHeure() + " : " + this.getFinalTW() + " heures\n" +
-            "                        <span class=\"mdc-list-item__secondary-text\">\n" +
-            "                            " + this.nbTaches + " Tâches\n" +
-            "                        </span>\n" +
-            "                    </span>\n" +
-            "                </li>"
-        return li
-    }
-
-    isFinished(date) {
-        return this.fin != false;
-    }
-
-    /**
-     * Session.isFinished() should be true
-     */
-    getFinalTW() {
-        var tempsMs = this.fin.objet - this.debut.objet
-        var tempsS = tempsMs / 1000;
-        return precisionRound(tempsS / 3600, 2);
-    }
-
-    save() {
-        if(navigator.cookieEnabled) {
-            let toSave = JSON.stringify(this);
-            console.log(toSave);
-            all_sessions.push(currentSession);
-            setCookie("all_sessions", toSave);
-        } else {
-            alert("Activez vos cookies")
-        }
-    }
-
-    getTWInteractif() {
-        var tempsMs = Date.now() - this.debut.objet
-        var tempsS = tempsMs / 1000;
-        return precisionRound(tempsS / 3600, 2);
-    }
+    updateAll();
 }
 
 function precisionRound(number, precision) {
@@ -89,7 +96,7 @@ function nouveau() {
         document.getElementById("add").disabled = false;
         document.getElementById("TW").innerText = "0.00";
         setInterval(function () {
-            document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()),2)
+            document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()), 2);
             document.getElementById("TW").innerText = currentSession.getTWInteractif();
         }, 1000 * 30)
     }
@@ -107,8 +114,9 @@ function finish() {
         document.getElementById("compt").innerText = "0";
         document.getElementById("PF").innerText = "";
         document.getElementById("TW").innerText = "";
-        currentSession.save()
+        currentSession.save();
         currentSession = null;
+        updateAll();
     }
 }
 
@@ -118,7 +126,7 @@ function add() {
     compteur.innerText = Number(compteur.innerText) + 1;
     let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
     snackbar.show({
-        message: "+1"
+            message: "+1"
         }
     );
     majPerf();
@@ -132,9 +140,8 @@ function remove() {
         compteur.innerText = Number(compteur.innerText) - 1;
         let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
         snackbar.show({
-                message: "-1"
-            }
-        );
+            message: "-1"
+        });
     }
     if (Number(compteur.innerText) <= 0) {
         document.getElementById("remove").disabled = true;
@@ -143,16 +150,16 @@ function remove() {
 }
 
 function majPerf() {
-    document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()),2)
+    document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()), 2)
 }
 
-window.onbeforeunload = function(){
+window.onbeforeunload = function () {
     return "T'es sûr de vouloir fermer ?";
 }
 
 function setCookie(sName, sValue) {
     var today = new Date(), expires = new Date();
-    expires.setTime(today.getTime() + (365*24*60*60*1000));
+    expires.setTime(today.getTime() + (365 * 24 * 60 * 60 * 1000));
     document.cookie = sName + "=" + encodeURIComponent(sValue) + ";expires=" + expires.toGMTString();
 }
 
