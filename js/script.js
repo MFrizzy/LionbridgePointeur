@@ -13,6 +13,8 @@ class Horaire {
     }
 }
 
+all_sessions = new Array();
+
 class Session {
     constructor(date) {
         this.debut = new Horaire(date);
@@ -54,7 +56,14 @@ class Session {
     }
 
     save() {
-        var a = "oé";
+        if(navigator.cookieEnabled) {
+            let toSave = JSON.stringify(this);
+            console.log(toSave);
+            all_sessions.push(currentSession);
+            setCookie("all_sessions", toSave);
+        } else {
+            alert("Activez vos cookies")
+        }
     }
 
     getTWInteractif() {
@@ -139,4 +148,20 @@ function majPerf() {
 
 window.onbeforeunload = function(){
     return "T'es sûr de vouloir fermer ?";
+}
+
+function setCookie(sName, sValue) {
+    var today = new Date(), expires = new Date();
+    expires.setTime(today.getTime() + (365*24*60*60*1000));
+    document.cookie = sName + "=" + encodeURIComponent(sValue) + ";expires=" + expires.toGMTString();
+}
+
+function getCookie(sName) {
+    var oRegex = new RegExp("(?:; )?" + sName + "=([^;]*);?");
+
+    if (oRegex.test(document.cookie)) {
+        return decodeURIComponent(RegExp["$1"]);
+    } else {
+        return null;
+    }
 }
