@@ -124,6 +124,7 @@ function precisionRound(number, precision) {
 }
 
 var currentSession = null;
+var endInterval = null;
 
 function nouveau() {
     if (currentSession == null) {
@@ -133,7 +134,7 @@ function nouveau() {
         document.getElementById("DD").innerText = currentSession.debut.getHeure();
         document.getElementById("add").disabled = false;
         document.getElementById("TW").innerText = "0.00";
-        setInterval(function () {
+        endInterval = setInterval(function () {
             document.getElementById("PF").innerText = precisionRound(Number(document.getElementById("compt").innerText) / (30 * currentSession.getTWInteractif()), 2);
             document.getElementById("TW").innerText = currentSession.getTWInteractif();
         }, 1000 * 30)
@@ -155,6 +156,7 @@ function finish() {
         document.getElementById("TW").innerText = "";
         currentSession.save();
         currentSession = null;
+        clearInterval(endInterval);
         updateAll();
     }
 }
