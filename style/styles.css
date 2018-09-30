@@ -30,6 +30,7 @@
 .carte {
     width: 300px;
     margin: 15px;
+    margin-bottom:0;
 }
 
 .organizer {
@@ -60,4 +61,12 @@ button.mdc-fab:disabled {
 
 div.mdc-toolbar__row {
     min-height: 48px
+}
+
+body {
+    margin: 0;
+}
+
+#histo_all > h3 {
+    margin:5px;
 }

@@ -2,11 +2,13 @@ class Session {
     constructor(date) {
         this.debut = new Horaire(date);
         this.fin = false;
+        this.finished = false;
     }
 
     end(date, nbTaches) {
         this.fin = new Horaire(date);
         this.nbTaches = nbTaches;
+        this.finished = true;
     }
 
     /**
@@ -27,7 +29,7 @@ class Session {
     }
 
     isFinished(date) {
-        return this.fin != false;
+        return this.finished;
     }
 
     /**
@@ -40,13 +42,9 @@ class Session {
     }
 
     save() {
-        if (navigator.cookieEnabled) {
-            all_sessions[this.debut.objet] = this;
-            let toSave = JSON.stringify(all_sessions);
-            setCookie("all_sessions", toSave);
-        } else {
-            alert("Activez vos cookies")
-        }
+        all_sessions[this.debut.objet] = this;
+        let toSave = JSON.stringify(all_sessions);
+        setCookie("all_sessions", toSave);
     }
 
     getTWInteractif() {

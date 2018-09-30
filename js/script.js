@@ -11,32 +11,29 @@ if (getCookie("all_sessions")) all_sessions = JSON.parse(getCookie("all_sessions
  *
  * @param fonction qui prend comme paramètre chaque element de all_sessions
  */
-all_sessions.forEach = function(fonction) {
+all_sessions.forEach = function (fonction) {
     all_sessions_keys = Object.keys(all_sessions);
     i = 0;
     while (i < all_sessions_keys.length) {
         current = all_sessions[all_sessions_keys[i]];
-        if(current != all_sessions.forEach) {
+        if (current != all_sessions.forEach) {
             fonction(current);
         }
         i++;
     }
 };
 
-
-
-/*
-all_sessions.forEach(function (element) {
-    element.debut.getHeure = modelHoraire.getHeure();
-    element.fin.getHeure = modelHoraire.getHeure();
-    element.generateLi = modelSession.generateLi();
-    element.getFinalTW = modelSession.getFinalTW();
-});
-*/
+/**
+ * Récupération ex current sessions si partie pas finie
+ */
+if (!(getCookie('current') == "null" || getCookie('current') == null)) {
+    cookie_current = JSON.parse(getCookie("current"));
+    all_sessions[cookie_current.debut.objet] = cookie_current;
+}
 
 today_sessions = [];
 
-all_sessions.forEach(function(current) {
+all_sessions.forEach(function (current) {
     if (current.debut.date == today) {
         today_sessions.push(current);
     }
@@ -47,22 +44,63 @@ all_sessions.forEach(function(current) {
     document.getElementById("histoj").innerHTML += current.generateLi();
 });
 
+histoAll = document.getElementById("histo_all");
+histoToday = document.getElementById('histoj');
+all_sessions_by_day = {};
+
 updateAll();
 
 function updateAll() {
+
     totalSecondes = 0;
     totalTaches = 0;
 
     // Nettoyage sale de historique du jour
-    document.getElementById("histoj").innerHTML = "";
+    histoToday.innerHTML = "";
+    histoAll.innerHTML = "";
 
-    all_sessions.forEach(function(current) {
-        if(current.debut.date == today) {
-            document.getElementById("histoj").innerHTML += current.generateLi();
+    all_sessions.forEach(function (current) {
+
+        if (current.debut.date == today) {
+            histoToday.innerHTML += current.generateLi();
             totalSecondes += current.fin.objet - current.debut.objet;
             totalTaches += Number(current.nbTaches);
         }
+
+        //histoAll.innerHTML += current.generateLi();
+
     });
+
+    all_sessions_by_day = {};
+    for (var date in all_sessions_by_day) {
+        delete all_sessions_by_day[date];
+    }
+
+    all_sessions.forEach(function (session) {
+
+        if (all_sessions_by_day[session.debut.date]) {
+            all_sessions_by_day[session.debut.date].push(session);
+        } else {
+            all_sessions_by_day[session.debut.date] = [session];
+        }
+    });
+
+    for (var date in all_sessions_by_day) {
+        tab_sessions = all_sessions_by_day[date];
+        // Creer h3 avec nom jour
+        h3 = document.createElement("h3");
+        h3.innerText = date;
+        // Creéer div de l'accordéon
+        div = document.createElement("div");
+        contenuDiv = "<ul class=\"mdc-list mdc-list--two-line\" >";
+        tab_sessions.forEach(function (session) {
+            contenuDiv += session.generateLi();
+        });
+        div.innerHTML = contenuDiv + "</ul>";
+        // ajouter tout ça dans le histoAll
+        histoAll.appendChild(h3);
+        histoAll.appendChild(div);
+    }
 
     totalHeures = totalSecondes / (60 * 60 * 1000); // 60 minutes * 60 secondes * 1000 millisecondes
     document.getElementById("today_heures").innerText = precisionRound(totalHeures, 2) + " heures"
@@ -104,6 +142,7 @@ function nouveau() {
 
 function finish() {
     if (currentSession != null) {
+        setCookie("current", null);
         currentSession.end(new Date(), document.getElementById("compt").innerText);
         document.getElementById("new").disabled = false;
         document.getElementById("finish").disabled = true;
@@ -122,13 +161,18 @@ function finish() {
 
 
 function add() {
-    let compteur = document.getElementById("compt");
-    compteur.innerText = Number(compteur.innerText) + 1;
+    var compteur = document.getElementById("compt");
+    currentSession.nbTaches = Number(compteur.innerText) + 1;
+    compteur.innerText = currentSession.nbTaches;
     let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
     snackbar.show({
             message: "+1"
         }
     );
+    // Add temporary end date for currentSession
+    currentSession.fin = new Horaire(new Date());
+    // Save in cookies current session
+    setCookie("current", JSON.stringify(currentSession));
     majPerf();
     if (Number(compteur.innerText) > 0)
         document.getElementById("remove").disabled = false;
@@ -137,12 +181,17 @@ function add() {
 function remove() {
     var compteur = document.getElementById("compt");
     if (Number(compteur.innerText) > 0) {
-        compteur.innerText = Number(compteur.innerText) - 1;
+        currentSession.nbTaches = Number(compteur.innerText) - 1;
+        compteur.innerText = currentSession.nbTaches;
         let snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById("snack"));
         snackbar.show({
             message: "-1"
         });
     }
+    // Add temporary end date for currentSession
+    currentSession.fin = new Horaire(new Date());
+    // Save in cookies current session
+    setCookie("current", JSON.stringify(currentSession));
     if (Number(compteur.innerText) <= 0) {
         document.getElementById("remove").disabled = true;
     }
@@ -158,17 +207,26 @@ window.onbeforeunload = function () {
 }
 
 function setCookie(sName, sValue) {
-    var today = new Date(), expires = new Date();
-    expires.setTime(today.getTime() + (365 * 24 * 60 * 60 * 1000));
-    document.cookie = sName + "=" + encodeURIComponent(sValue) + ";expires=" + expires.toGMTString();
+    if (navigator.cookieEnabled) {
+        var today = new Date(), expires = new Date();
+        expires.setTime(today.getTime() + (365 * 24 * 60 * 60 * 1000));
+        document.cookie = sName + "=" + encodeURIComponent(sValue) + ";expires=" + expires.toGMTString();
+    } else {
+        alert("Activez vos cookies");
+    }
+
 }
 
 function getCookie(sName) {
-    var oRegex = new RegExp("(?:; )?" + sName + "=([^;]*);?");
-
-    if (oRegex.test(document.cookie)) {
-        return decodeURIComponent(RegExp["$1"]);
+    if (navigator.cookieEnabled) {
+        var oRegex = new RegExp("(?:; )?" + sName + "=([^;]*);?");
+        if (oRegex.test(document.cookie)) {
+            return decodeURIComponent(RegExp["$1"]);
+        } else {
+            return null;
+        }
     } else {
-        return null;
+        alert("Activez vos cookies");
     }
+
 }
